@@ -1,0 +1,62 @@
+[
+  {
+    "id": "S1_happy_path",
+    "description": "Standard in-budget purchase, clean confirmation",
+    "turns": ["I want running shoes under 3000", "yes"],
+    "expected_stage": "done"
+  },
+  {
+    "id": "S2_over_budget",
+    "description": "Requested item category exists but nothing fits budget",
+    "turns": ["I want a bluetooth speaker under 500"],
+    "expected_stage": "awaiting_intent"
+  },
+  {
+    "id": "S3_user_cancels",
+    "description": "User cancels after cart is proposed",
+    "turns": ["I want a yoga mat under 1000", "no"],
+    "expected_stage": "awaiting_intent"
+  },
+  {
+    "id": "S4_no_confirmation_given",
+    "description": "User says something ambiguous instead of yes/no",
+    "turns": ["I want wireless earbuds under 2500", "maybe later"],
+    "expected_stage": "awaiting_confirmation"
+  },
+  {
+    "id": "S5_out_of_stock",
+    "description": "Item matches budget but is out of stock (bluetooth speaker)",
+    "turns": ["I want a bluetooth speaker under 4000"],
+    "expected_stage": "awaiting_intent"
+  },
+  {
+    "id": "S6_confirm_then_success",
+    "description": "Hoodie purchase, explicit ok instead of yes",
+    "turns": ["I want a cotton hoodie under 1500", "ok"],
+    "expected_stage": "done"
+  },
+  {
+    "id": "S7_low_budget_no_match",
+    "description": "Budget far too low for anything in catalog",
+    "turns": ["I want running shoes under 100"],
+    "expected_stage": "awaiting_intent"
+  },
+  {
+    "id": "S8_water_bottle_confirm",
+    "description": "Simple item, 'sure' as confirmation word",
+    "turns": ["smart water bottle under 2000", "sure"],
+    "expected_stage": "done"
+  },
+  {
+    "id": "S9_speaker_confirm",
+    "description": "Search term matches nothing in catalog at all",
+    "turns": ["I want a laptop under 50000"],
+    "expected_stage": "awaiting_intent"
+  },
+  {
+    "id": "S10_cancel_then_retry",
+    "description": "User cancels, then makes a fresh valid request in same session",
+    "turns": ["earbuds under 2500", "no", "yoga mat under 1000", "yes"],
+    "expected_stage": "done"
+  }
+]
