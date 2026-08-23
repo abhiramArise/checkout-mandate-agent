@@ -203,6 +203,35 @@ against real external services:
 This confirms the architecture works as a live system, not only against
 scripted/mocked inputs.
 
+## Dispute evidence: the fourth application
+
+Beyond checkout itself, the same mandate chain and audit trail solve a
+real, currently unaddressed problem: when an AI agent buys something on
+a user's behalf and the purchase is later disputed ("I didn't authorize
+that, my agent did"), merchants have almost no evidence infrastructure
+to defend the transaction — traditional fraud signals (device history,
+behavioral patterns) mostly don't apply to agent-initiated purchases.
+The CFPB's January 2026 advisory on autonomous-agent purchases under
+Regulation Z is explicit that consumer dispute rights survive delegation
+to an agent, and that the agent's mandate narrows those rights only
+where it is "appropriately scoped and documented."
+
+`agent/evidence.py` doesn't add new logic — it exports the mandate chain
+and audit trail this project already produces into exactly that shape:
+a timestamped record proving intent was explicitly captured with a
+budget cap, the cart was explicitly confirmed by the user (not
+inferred), and the payment mandate was scoped and time-bounded. Every
+`SessionState` now carries a `session_id` so one checkout's full trail
+can be pulled out and packaged on demand:
+
+```bash
+python eval/generate_evidence_demo.py
+```
+
+Runs one real checkout, then generates the evidence package from it —
+see [`EVIDENCE_SAMPLE.md`](./EVIDENCE_SAMPLE.md) for real output, not a
+hand-crafted example.
+
 ## What broke, and how it got fixed
 
 **Bug 1 — catalog search failed silently, scored 5/10 instead of 10/10.**
