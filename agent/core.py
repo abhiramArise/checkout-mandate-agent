@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import re
 import json
+import uuid
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -40,6 +41,7 @@ CANCEL_WORDS = {"no", "cancel", "stop", "nevermind", "never mind"}
 
 @dataclass
 class SessionState:
+    session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     intent: Optional[IntentMandate] = None
     cart: Optional[CartMandate] = None
     payment: Optional[PaymentMandate] = None
@@ -90,6 +92,11 @@ def _llm_extract_intent(message: str, client) -> dict:
     text = re.sub(r"^```json|```$", "", text, flags=re.MULTILINE).strip()
     result = json.loads(text)
 
+    # defensive: the model doesn't always follow the closed category list
+    # (e.g. returns 'sportswear' instead of 'fitness'/'footwear') --
+    # rather than trust the prompt alone, validate here and fall back to
+    # null so search_catalog's category fallback is only ever trusted
+    # with a category that actually exists in the catalog.
     if result.get("category") not in valid_categories:
         result["category"] = None
 
@@ -133,9 +140,9 @@ class CheckoutAgent:
                     category=extracted.get("category"),
                 )
                 state.intent.sign(MANDATE_SECRET)
-                log_event("intent", "intent_created", extracted)
+                log_event("intent", "intent_created", extracted, session_id=state.session_id)
             except Exception as e:
-                log_event("intent", "intent_parse_failed", {"raw": message}, str(e))
+                log_event("intent", "intent_parse_failed", {"raw": message}, str(e), session_id=state.session_id)
                 return ("Sorry, I couldn't understand your budget or request. "
                         "Could you rephrase, e.g. 'running shoes under 3000'?"), state
 
@@ -143,8 +150,7 @@ class CheckoutAgent:
             affordable = [r for r in results if r["price"] <= state.intent.max_budget and r["stock"] > 0]
 
             if not affordable:
-                log_event("cart", "no_match_or_over_budget",
-                          {"query": extracted["goal"], "budget": state.intent.max_budget})
+                log_event("cart", "no_match_or_over_budget", {"query": extracted["goal"], "budget": state.intent.max_budget}, session_id=state.session_id)
                 return (f"I couldn't find anything matching '{extracted['goal']}' "
                         f"within your budget of ₹{state.intent.max_budget:.0f}. "
                         "Want to raise your budget or try a different item?"), state
@@ -153,10 +159,10 @@ class CheckoutAgent:
             try:
                 state.cart = CartMandate.create(state.intent, item["name"], item["price"], MANDATE_SECRET)
             except MandateError as e:
-                log_event("cart", "cart_creation_rejected", {"item": item}, str(e))
+                log_event("cart", "cart_creation_rejected", {"item": item}, str(e), session_id=state.session_id)
                 return f"Couldn't add that to cart: {e}", state
 
-            log_event("cart", "cart_proposed", {"item": item["name"], "price": item["price"]})
+            log_event("cart", "cart_proposed", {"item": item["name"], "price": item["price"]}, session_id=state.session_id)
             state.stage = "awaiting_confirmation"
             return (f"Found: {item['name']} at ₹{item['price']:.0f}. "
                     f"Confirm purchase? (yes/no)"), state
@@ -164,7 +170,7 @@ class CheckoutAgent:
         # ---- Stage: awaiting_confirmation -> confirm cart, create+redeem payment mandate ----
         if state.stage == "awaiting_confirmation":
             if any(w in msg_lower for w in CANCEL_WORDS):
-                log_event("cart", "cart_cancelled_by_user", {"item": state.cart.item_name})
+                log_event("cart", "cart_cancelled_by_user", {"item": state.cart.item_name}, session_id=state.session_id)
                 state.stage = "awaiting_intent"
                 state.cart = None
                 return "No problem, cancelled. What would you like instead?", state
@@ -174,12 +180,11 @@ class CheckoutAgent:
 
             try:
                 state.cart.confirm(MANDATE_SECRET)
-                log_event("cart", "cart_confirmed", {"item": state.cart.item_name})
+                log_event("cart", "cart_confirmed", {"item": state.cart.item_name}, session_id=state.session_id)
                 state.payment = PaymentMandate.create(state.cart, MANDATE_SECRET)
-                log_event("payment", "payment_mandate_created",
-                          {"amount": state.payment.amount, "expiry": state.payment.expiry})
+                log_event("payment", "payment_mandate_created", {"amount": state.payment.amount, "expiry": state.payment.expiry}, session_id=state.session_id)
             except MandateError as e:
-                log_event("payment", "payment_mandate_rejected", {}, str(e))
+                log_event("payment", "payment_mandate_rejected", {}, str(e), session_id=state.session_id)
                 state.failed_attempts += 1
                 return self._maybe_hard_stop(state, f"Couldn't proceed: {e}")
 
@@ -191,13 +196,12 @@ class CheckoutAgent:
         try:
             state.payment.redeem(MANDATE_SECRET)
         except MandateError as e:
-            log_event("payment", "redeem_rejected", {}, str(e))
+            log_event("payment", "redeem_rejected", {}, str(e), session_id=state.session_id)
             state.failed_attempts += 1
             return self._maybe_hard_stop(state, f"Payment could not proceed: {e}")
 
         if self.dry_run or self.razorpay_client is None:
-            log_event("razorpay", "dry_run_success",
-                      {"amount": state.payment.amount, "item": state.cart.item_name})
+            log_event("razorpay", "dry_run_success", {"amount": state.payment.amount, "item": state.cart.item_name}, session_id=state.session_id)
             state.stage = "done"
             return (f"[dry-run] Payment of ₹{state.payment.amount:.0f} for "
                     f"{state.cart.item_name} authorized and would be sent to "
@@ -208,13 +212,12 @@ class CheckoutAgent:
             link = self.razorpay_client.create_payment_link(
                 order, description=state.cart.item_name
             )
-            log_event("razorpay", "payment_link_created",
-                      {"order_id": order.order_id, "link": link.short_url})
+            log_event("razorpay", "payment_link_created", {"order_id": order.order_id, "link": link.short_url}, session_id=state.session_id)
             state.stage = "done"
             return (f"Payment link created: {link.short_url} "
                     f"(₹{state.payment.amount:.0f} for {state.cart.item_name})"), state
         except RazorpayToolError as e:
-            log_event("razorpay", "razorpay_call_failed", {"code": e.code}, str(e))
+            log_event("razorpay", "razorpay_call_failed", {"code": e.code}, str(e), session_id=state.session_id)
             state.failed_attempts += 1
             return self._maybe_hard_stop(
                 state, f"Payment provider error ({e.code}): {e}. "
@@ -223,7 +226,7 @@ class CheckoutAgent:
 
     def _maybe_hard_stop(self, state: SessionState, message: str) -> tuple[str, SessionState]:
         if state.failed_attempts >= state.max_failed_attempts:
-            log_event("rejection", "hard_stop", {"attempts": state.failed_attempts})
+            log_event("rejection", "hard_stop", {"attempts": state.failed_attempts}, session_id=state.session_id)
             state.stage = "rejected"
             return (message + " Too many failed attempts — stopping here to "
                     "avoid a retry loop. Please start a new request."), state

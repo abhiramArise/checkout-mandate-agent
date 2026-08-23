@@ -6,14 +6,14 @@ No human turns in this run — the buyer agent decides every message based on it
 
 | Persona | Goal | Budget | Outcome | Final Stage | Turns | Time (s) |
 |---|---|---|---|---|---|---|
-| Budget shopper - shoes | running shoes | ₹3000 | purchase_completed | done | 2 | 0.0927 |
-| Tight budget - speaker | bluetooth speaker | ₹600 | session_ended_no_purchase | awaiting_intent | 2 | 0.0166 |
-| Flexible budget - earbuds | wireless earbuds | ₹2160 | purchase_completed | done | 4 | 0.0423 |
-| Haggler - hoodie | cotton hoodie | ₹1500 | purchase_completed | done | 3 | 0.02 |
-| Impatient - laptop (no match) | laptop | ₹50000 | session_ended_no_purchase | awaiting_intent | 1 | 0.0071 |
-| Exact match - yoga mat | yoga mat | ₹900 | purchase_completed | done | 2 | 0.025 |
-| Out of stock item - speaker high budget | bluetooth speaker | ₹4800 | session_ended_no_purchase | awaiting_intent | 2 | 0.0156 |
-| Generous budget - water bottle | smart water bottle | ₹5000 | purchase_completed | done | 2 | 0.0168 |
+| Budget shopper - shoes | running shoes | ₹3000 | purchase_completed | done | 2 | 0.002 |
+| Tight budget - speaker | bluetooth speaker | ₹600 | session_ended_no_purchase | awaiting_intent | 2 | 0.0 |
+| Flexible budget - earbuds | wireless earbuds | ₹2160 | purchase_completed | done | 4 | 0.0077 |
+| Haggler - hoodie | cotton hoodie | ₹1500 | purchase_completed | done | 3 | 0.0 |
+| Impatient - laptop (no match) | laptop | ₹50000 | session_ended_no_purchase | awaiting_intent | 1 | 0.0 |
+| Exact match - yoga mat | yoga mat | ₹900 | purchase_completed | done | 2 | 0.005 |
+| Out of stock item - speaker high budget | bluetooth speaker | ₹4800 | session_ended_no_purchase | awaiting_intent | 2 | 0.0 |
+| Generous budget - water bottle | smart water bottle | ₹5000 | purchase_completed | done | 2 | 0.0 |
 
 ## Audit trail summary
 
@@ -34,7 +34,7 @@ _Goal: running shoes, starting budget: ₹3000_
 - **Buyer agent:** I want running shoes under 3000
   **Merchant agent:** Found: Running Shoes - Blue, Size 9 at ₹2499. Confirm purchase? (yes/no)
 - **Buyer agent:** yes
-  **Merchant agent:** [dry-run] Payment of ₹2499 for Running Shoes - Blue, Size 9 authorized and would be sent to Razorpay. Mandate ID: 7839988a-78b4-49c0-99dd-cf08e93820e0
+  **Merchant agent:** [dry-run] Payment of ₹2499 for Running Shoes - Blue, Size 9 authorized and would be sent to Razorpay. Mandate ID: b28b3dfa-c450-469c-b2b8-8601c3d8f3c2
 
 ### Tight budget - speaker — session_ended_no_purchase
 _Goal: bluetooth speaker, starting budget: ₹600_
@@ -54,7 +54,7 @@ _Goal: wireless earbuds, starting budget: ₹2160_
 - **Buyer agent:** okay, wireless earbuds under 2160
   **Merchant agent:** Found: Wireless Earbuds at ₹1999. Confirm purchase? (yes/no)
 - **Buyer agent:** yes
-  **Merchant agent:** [dry-run] Payment of ₹1999 for Wireless Earbuds authorized and would be sent to Razorpay. Mandate ID: f0d71ecf-63a5-4719-9655-4ab2077d296a
+  **Merchant agent:** [dry-run] Payment of ₹1999 for Wireless Earbuds authorized and would be sent to Razorpay. Mandate ID: 91890cdb-a182-4def-8363-7bfb37ef4d28
 
 ### Haggler - hoodie — purchase_completed
 _Goal: cotton hoodie, starting budget: ₹1500_
@@ -64,7 +64,7 @@ _Goal: cotton hoodie, starting budget: ₹1500_
 - **Buyer agent:** can you do better on price?
   **Merchant agent:** I need an explicit yes or no before proceeding — confirm purchase?
 - **Buyer agent:** yes
-  **Merchant agent:** [dry-run] Payment of ₹1299 for Cotton Hoodie - Blue, Size M authorized and would be sent to Razorpay. Mandate ID: 1a6e9bf2-7e55-4af7-828f-605c506b8956
+  **Merchant agent:** [dry-run] Payment of ₹1299 for Cotton Hoodie - Blue, Size M authorized and would be sent to Razorpay. Mandate ID: bc170c74-fec4-460b-bd80-c19b02ce656c
 
 ### Impatient - laptop (no match) — session_ended_no_purchase
 _Goal: laptop, starting budget: ₹50000_
@@ -78,7 +78,7 @@ _Goal: yoga mat, starting budget: ₹900_
 - **Buyer agent:** I want yoga mat under 900
   **Merchant agent:** Found: Yoga Mat at ₹899. Confirm purchase? (yes/no)
 - **Buyer agent:** yes
-  **Merchant agent:** [dry-run] Payment of ₹899 for Yoga Mat authorized and would be sent to Razorpay. Mandate ID: 52414b48-638a-4b4f-ad0a-79ff686cca61
+  **Merchant agent:** [dry-run] Payment of ₹899 for Yoga Mat authorized and would be sent to Razorpay. Mandate ID: 8f3f622b-7196-4c8b-89a9-8a8e5fbfed3b
 
 ### Out of stock item - speaker high budget — session_ended_no_purchase
 _Goal: bluetooth speaker, starting budget: ₹4800_
@@ -94,4 +94,4 @@ _Goal: smart water bottle, starting budget: ₹5000_
 - **Buyer agent:** I want smart water bottle under 5000
   **Merchant agent:** Found: Smart Water Bottle at ₹1499. Confirm purchase? (yes/no)
 - **Buyer agent:** yes
-  **Merchant agent:** [dry-run] Payment of ₹1499 for Smart Water Bottle authorized and would be sent to Razorpay. Mandate ID: e5f1f779-26f0-4078-b6c3-95ac8c4225f3
+  **Merchant agent:** [dry-run] Payment of ₹1499 for Smart Water Bottle authorized and would be sent to Razorpay. Mandate ID: 21880494-4ba8-4af1-9ca8-5991719c78cf

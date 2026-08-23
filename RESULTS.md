@@ -6,16 +6,16 @@ Run mode: dry-run (no live Razorpay/Groq calls — LLM extraction falls back to 
 
 | Scenario | Description | Expected | Actual | Result | Turns | Time (s) |
 |---|---|---|---|---|---|---|
-| S1_happy_path | Standard in-budget purchase, clean confirmation | done | done | PASS | 2 | 1.5582 |
-| S2_over_budget | Requested item category exists but nothing fits budget | awaiting_intent | awaiting_intent | PASS | 1 | 0.711 |
-| S3_user_cancels | User cancels after cart is proposed | awaiting_intent | awaiting_intent | PASS | 2 | 0.5889 |
-| S4_no_confirmation_given | User says something ambiguous instead of yes/no | awaiting_confirmation | awaiting_confirmation | PASS | 2 | 0.6461 |
-| S5_out_of_stock | Item matches budget but is out of stock (bluetooth speaker) | awaiting_intent | awaiting_intent | PASS | 1 | 1.8002 |
-| S6_confirm_then_success | Hoodie purchase, explicit ok instead of yes | done | done | PASS | 2 | 0.571 |
-| S7_low_budget_no_match | Budget far too low for anything in catalog | awaiting_intent | awaiting_intent | PASS | 1 | 0.6407 |
-| S8_water_bottle_confirm | Simple item, 'sure' as confirmation word | done | done | PASS | 2 | 0.6731 |
-| S9_speaker_confirm | Search term matches nothing in catalog at all | awaiting_intent | awaiting_intent | PASS | 1 | 1.486 |
-| S10_cancel_then_retry | User cancels, then makes a fresh valid request in same session | done | done | PASS | 4 | 2.414 |
+| S1_happy_path | Standard in-budget purchase, clean confirmation | done | done | PASS | 2 | 1.4273 |
+| S2_over_budget | Requested item category exists but nothing fits budget | awaiting_intent | awaiting_intent | PASS | 1 | 0.7603 |
+| S3_user_cancels | User cancels after cart is proposed | awaiting_intent | awaiting_intent | PASS | 2 | 0.7362 |
+| S4_no_confirmation_given | User says something ambiguous instead of yes/no | awaiting_confirmation | awaiting_confirmation | PASS | 2 | 0.696 |
+| S5_out_of_stock | Item matches budget but is out of stock (bluetooth speaker) | awaiting_intent | awaiting_intent | PASS | 1 | 0.7245 |
+| S6_confirm_then_success | Hoodie purchase, explicit ok instead of yes | done | done | PASS | 2 | 0.6185 |
+| S7_low_budget_no_match | Budget far too low for anything in catalog | awaiting_intent | awaiting_intent | PASS | 1 | 0.683 |
+| S8_water_bottle_confirm | Simple item, 'sure' as confirmation word | done | done | PASS | 2 | 0.7137 |
+| S9_speaker_confirm | Search term matches nothing in catalog at all | awaiting_intent | awaiting_intent | PASS | 1 | 0.6836 |
+| S10_cancel_then_retry | User cancels, then makes a fresh valid request in same session | done | done | PASS | 4 | 1.4205 |
 
 ## Audit trail summary
 
@@ -36,7 +36,7 @@ _Standard in-budget purchase, clean confirmation_
 - **User:** I want running shoes under 3000
   **Agent:** Found: Running Shoes - Blue, Size 9 at ₹2499. Confirm purchase? (yes/no)
 - **User:** yes
-  **Agent:** [dry-run] Payment of ₹2499 for Running Shoes - Blue, Size 9 authorized and would be sent to Razorpay. Mandate ID: 97894ea9-a3c4-4f58-8d67-9fbaa4660047
+  **Agent:** [dry-run] Payment of ₹2499 for Running Shoes - Blue, Size 9 authorized and would be sent to Razorpay. Mandate ID: c39dd98d-f176-4efe-bf9b-b356b8858145
 
 ### S2_over_budget — PASS
 _Requested item category exists but nothing fits budget_
@@ -72,7 +72,7 @@ _Hoodie purchase, explicit ok instead of yes_
 - **User:** I want a cotton hoodie under 1500
   **Agent:** Found: Cotton Hoodie - Blue, Size M at ₹1299. Confirm purchase? (yes/no)
 - **User:** ok
-  **Agent:** [dry-run] Payment of ₹1299 for Cotton Hoodie - Blue, Size M authorized and would be sent to Razorpay. Mandate ID: 501be36c-b378-4ffc-8da8-b018c5b4ce85
+  **Agent:** [dry-run] Payment of ₹1299 for Cotton Hoodie - Blue, Size M authorized and would be sent to Razorpay. Mandate ID: f100a7bc-dae7-4130-a7aa-2706b96b1966
 
 ### S7_low_budget_no_match — PASS
 _Budget far too low for anything in catalog_
@@ -86,7 +86,7 @@ _Simple item, 'sure' as confirmation word_
 - **User:** smart water bottle under 2000
   **Agent:** Found: Smart Water Bottle at ₹1499. Confirm purchase? (yes/no)
 - **User:** sure
-  **Agent:** [dry-run] Payment of ₹1499 for Smart Water Bottle authorized and would be sent to Razorpay. Mandate ID: e860aea7-6850-4975-8fae-fd950fe362c1
+  **Agent:** [dry-run] Payment of ₹1499 for Smart Water Bottle authorized and would be sent to Razorpay. Mandate ID: be4d3eca-d7ce-44ff-9c5f-384bcde7b874
 
 ### S9_speaker_confirm — PASS
 _Search term matches nothing in catalog at all_
@@ -104,4 +104,4 @@ _User cancels, then makes a fresh valid request in same session_
 - **User:** yoga mat under 1000
   **Agent:** Found: Yoga Mat at ₹899. Confirm purchase? (yes/no)
 - **User:** yes
-  **Agent:** [dry-run] Payment of ₹899 for Yoga Mat authorized and would be sent to Razorpay. Mandate ID: 47d85912-207e-4c65-a197-e1f104fc461c
+  **Agent:** [dry-run] Payment of ₹899 for Yoga Mat authorized and would be sent to Razorpay. Mandate ID: 400c3902-269f-459e-9117-0b343c2c2bed
