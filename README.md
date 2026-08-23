@@ -19,17 +19,38 @@ below.
 Agent-to-agent commerce is moving fast right now — ChatGPT's Instant
 Checkout runs on Stripe/OpenAI's ACP, Google's AP2 has 60+ partners
 building around cryptographically signed "mandates," and Coinbase's x402
-has processed over 100M agent transactions. Razorpay's own Buildathon
-brief calls this "the open problem of the year."
+has processed over 100M agent transactions. Card networks are in
+production on this too: Mastercard Agent Pay and Visa's Trusted Agent
+Protocol now provide agent-authorization rails with configurable spend
+caps, merchant restrictions, and expiration windows, and in March 2026
+Banco Santander and Mastercard completed what they describe as Europe's
+first live end-to-end payment executed by an AI agent on production
+infrastructure. Razorpay's own Buildathon brief calls this "the open
+problem of the year" — and the regulatory side agrees it's unresolved: a
+2026 legal analysis notes it remains an open question whether AI agent
+authorization even satisfies existing Regulation E requirements, which
+were written assuming a human is the one clicking "buy."
 
-**This project does not implement AP2, ACP, or any other spec.** No solo
-two-week build should claim protocol compliance — that's a fast way to
-lose credibility with anyone who actually knows the space. What it does
-implement, from scratch, is the *underlying pattern* those protocols are
-converging on: an explicit, signed, bounded authorization chain between
-"what the user wants" and "money actually moving." That pattern is the
-transferable idea, and it's fully working here against Razorpay's real
-test-mode Orders and Payment Links APIs.
+The specific failure mode this project targets has a name: **authority
+decay** (also classified by OWASP as "Excessive Agency"). A user
+authorizes Agent A with a defined budget and scope; Agent A delegates to
+Agent B; Agent B has no direct relationship with the original user — it
+only knows what Agent A told it. Without explicit scope enforcement at
+each handoff, agents can end up operating beyond what was actually
+authorized. That's exactly what this project's mandate chain, and the
+buyer agent's own independently-enforced budget cap, are built to
+prevent: authorization that survives a handoff between two
+independently-reasoning agents, not just a single agent's word for it.
+
+**This project does not implement AP2, ACP, Agent Pay, or any other
+spec.** No solo two-week build should claim protocol compliance —
+that's a fast way to lose credibility with anyone who actually knows the
+space. What it does implement, from scratch, is the *underlying
+pattern* those protocols and card-network frameworks are converging on:
+an explicit, signed, bounded authorization chain between "what the user
+wants" and "money actually moving." That pattern is the transferable
+idea, and it's fully working here against Razorpay's real test-mode
+Orders and Payment Links APIs.
 
 ## Architecture
 
